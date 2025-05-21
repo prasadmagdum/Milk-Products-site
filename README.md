@@ -22,7 +22,7 @@ Installation Guide
 Follow these steps to set up the project locally:
 
 1️ Clone the repository:
-git clone https://github.com/your-username/milk-products-site.git
+git clone https://github.com/prasadmagdum/Milk-Products-site/edit/main
 cd milk-products-site
 2️ Create and activate a virtual environment:
 python -m venv venv  
