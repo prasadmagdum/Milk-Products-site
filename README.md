@@ -36,17 +36,6 @@ python manage.py migrate
 python manage.py runserver
 Open the application in your browser at http://127.0.0.1:8000/
 
-Project Structure
-Milk-Products-Site/
-│── milk_products/    # Main application directory
-│   │── templates/    # HTML templates
-│   │── static/       # Static files (CSS, JS, images)
-│   │── models.py     # Database models
-│   │── views.py      # Application views
-│   │── urls.py       # URL configurations
-│── manage.py         # Django management script
-│── requirements.txt  # Python dependencies
-│── README.md         # Project documentation
 Usage
 Access the admin panel at http://127.0.0.1:8000/admin/ to manage products and categories.
 
