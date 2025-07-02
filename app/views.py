@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.views import View
+
+from .forms import CustomerProfileForm, CustomerRegistrationFrom
+from django.contrib import messages
 from . models import Product
 from django.db.models import Count
 
@@ -31,3 +34,23 @@ class ProductDetail(View):
         product=Product.objects.get(pk=pk)
         return render(request,"app/productdetail.html",locals())
     
+class CustomerRegistrationView(View):
+    def get(self,request):
+        form = CustomerRegistrationFrom()
+        return render(request, 'app/customerregistration.html',locals() )
+    def post(self, request):
+        form = CustomerRegistrationFrom(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"congratulations! User Register Successfully")
+        else:
+            messages.warning(request," Invalid Input Data ")
+        return render(request, 'app/customerregistration.html',locals())
+
+class ProfileView(View):
+    def get(self,request):
+        form = CustomerProfileForm()
+        return render (request , 'app/profile.html', locals())
+    
+    def post(self , request):
+        return render (request , 'app/profile.html', locals())
