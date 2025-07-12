@@ -1,3 +1,4 @@
+
 # Register your models here.
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
