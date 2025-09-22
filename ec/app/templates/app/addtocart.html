@@ -1,0 +1,115 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Full-width heading -->
+    <div class="col-12">
+      <h1 class="text-center mb-5">Shopping Cart</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    {% if cart %}
+      <!-- Left: Cart items -->
+      <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h4 class="mb-4">Cart</h4>
+
+            {% for item in cart %}
+              <div class="row align-items-center mb-4">
+                <!-- Image -->
+                <div class="col-md-3 text-center">
+                  <img src="{{ item.product.product_image.url }}"
+                       alt="{{ item.product.title }}"
+                       class="img-fluid img-thumbnail"
+                       style="max-height:120px;">
+                </div>
+
+                <!-- Info -->
+                <div class="col-md-9">
+                  <h5 class="mb-1">{{ item.product.title }}</h5>
+                  <p class="text-muted small mb-3">{{ item.product.description }}</p>
+
+                  <!-- Quantity controls -->
+                  <div class="d-flex align-items-center mb-2">
+                    <label class="me-3 mb-0">Quantity:</label>
+                    <a class="minus-cart btn btn-sm" pid="{{ item.product.id }}">
+                      <i class="fas fa-minus-square fa-lg"></i>
+                    </a>
+                    <span class="mx-2" id="quantity-{{ item.product.id }}">{{ item.quantity }}</span>
+                    <a class="plus-cart btn btn-sm" pid="{{ item.product.id }}">
+                      <i class="fas fa-plus-square fa-lg"></i>
+                    </a>
+                  </div>
+
+                  <!-- Remove + Price -->
+                  <div class="d-flex justify-content-between align-items-center">
+                    <a href="#" class="remove-cart btn btn-sm btn-secondary" pid="{{ item.product.id }}">Remove item</a>
+                    <h6 class="mb-0">Rs. {{ item.product.discounted_price }}</h6>
+                  </div>
+                </div>
+              </div>
+
+              {% if not forloop.last %}
+                <hr class="my-3">
+              {% endif %}
+            {% endfor %}
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Order summary -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h4 class="mb-4">The Total Amount of</h4>
+
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Amount</span>
+                <strong id="amount">Rs. {{ amount }}</strong>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Shipping</span>
+                <strong>Rs. 40.00</strong>
+              </li>
+
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span><strong>Total</strong> <small class="text-muted">(including GST)</small></span>
+                {# support two possible variable names in your view #}
+                <strong id="totalamount">
+                  Rs.
+                  {% if totalamount %}
+                    {{ totalamount }}
+                  {% elif totalamout %}
+                    {{ totalamout }}
+                  {% else %}
+                    0.00
+                  {% endif %}
+                </strong>
+              </li>
+            </ul>
+
+            <div class="d-grid">
+              <!-- Make sure you have a URL named 'checkout' in urls.py -->
+              <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100">Place Order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <div class="col-12">
+        <h3 class="text-center">Cart is Empty</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock main-content %}  
