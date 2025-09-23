@@ -142,3 +142,6 @@ def plus_cart(request):
             'totalamount': totalamount
         }
         return JsonResponse(data)
+    
+def minus_cart(request):
+    pass
