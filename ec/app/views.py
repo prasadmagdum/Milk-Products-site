@@ -120,28 +120,58 @@ def show_cart(request):
 
     return render(request, 'app/addtocart.html', locals())
 
-
 def plus_cart(request):
     if request.method == 'GET':
         prod_id = request.GET['prod_id']
-        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
-        c.quantity += 1
-        c.save()
 
-        user = request.user
-        cart = Cart.objects.filter(user=user)
-        amount = 0
-        for p in cart:
-            value = p.quantity * p.product.discounted_price
-            amount += value
+        c = Cart.objects.filter(product=prod_id, user=request.user).first()
+        if c:
+            c.quantity += 1
+            c.save()
+
+        cart = Cart.objects.filter(user=request.user)
+        amount = sum([p.quantity * p.product.discounted_price for p in cart])
         totalamount = amount + 40
 
         data = {
-            'quantity': c.quantity,
+            'quantity': c.quantity if c else 0,
             'amount': amount,
             'totalamount': totalamount
         }
         return JsonResponse(data)
     
 def minus_cart(request):
-    pass
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+
+        c = Cart.objects.filter(product=prod_id, user=request.user).first()
+        if c and c.quantity > 1:
+            c.quantity -= 1
+            c.save()
+
+        cart = Cart.objects.filter(user=request.user)
+        amount = sum([p.quantity * p.product.discounted_price for p in cart])
+        totalamount = amount + 40
+
+        data = {
+            'quantity': c.quantity if c else 0,
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+    
+def remove_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+
+        Cart.objects.filter(product=prod_id, user=request.user).delete()
+
+        cart = Cart.objects.filter(user=request.user)
+        amount = sum([p.quantity * p.product.discounted_price for p in cart])
+        totalamount = amount + 40
+
+        data = {
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
