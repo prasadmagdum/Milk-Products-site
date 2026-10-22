@@ -1,0 +1,25 @@
+{% extends "app/base.html" %}
+
+{% block title %}Order #{{ order.id }}{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+    <h1>Order #{{ order.id }}</h1>
+    <p>Placed {{ order.created_at|date:"M j, Y H:i" }} · {{ order.get_status_display }}</p>
+    <h2 class="h4 mt-4">Items</h2>
+    <div class="list-group mb-4">
+        {% for item in order.items.all %}
+            <div class="list-group-item d-flex justify-content-between">
+                <span>{{ item.product_title }} × {{ item.quantity }}</span>
+                <span>Rs. {{ item.total_cost }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    <p>Shipping: Rs. {{ order.shipping_cost }}</p>
+    <p class="fw-bold">Total: Rs. {{ order.total_amount }}</p>
+    <p>Payment: Cash on delivery</p>
+    <h2 class="h4 mt-4">Delivery address</h2>
+    <p>{{ order.delivery_name }}<br>{{ order.delivery_address }}<br>Mobile: {{ order.delivery_mobile }}</p>
+    <a href="{% url 'orders' %}" class="btn btn-outline-primary">Back to orders</a>
+</div>
+{% endblock main-content %}
