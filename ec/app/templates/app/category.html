@@ -19,20 +19,24 @@
         <div class="col-sm-9">
             <div class="row">
                 {% for prod in product %}
-                    <div class="col text-center mb-4">
-                        <a href="{% url 'productdetail' prod.id %} " class="btn">
+                    <div class="col-md-4 text-center mb-4">
+                        <a href="{% url 'productdetail' prod.id %}" class="btn">
                             <div>
-                                <img src="{{ prod.product_image.url }}" alt="{{ prod.title }}" width="300px" height="200px" />
+                                {% if prod.product_image %}
+                                    <img src="{{ prod.product_image.url }}" alt="{{ prod.title }}" class="img-fluid" style="max-height:200px; object-fit:contain;">
+                                {% endif %}
                                 <div class="fw-bold">{{ prod.title }}</div>
                                 <div class="fw-bold text-danger">
-                                    Rs.{{ prod.discounted_price }}/-
+                                    Rs.{{ prod.discounted_price|floatformat:2 }}/-
                                     <small class="fw-light text-decoration-line-through">
-                                        Rs.{{ prod.selling_price }}
+                                        Rs.{{ prod.selling_price|floatformat:2 }}
                                     </small>
                                 </div>
                             </div>
                         </a>
                     </div>
+                {% empty %}
+                    <p>No products are available in this category yet.</p>
                 {% endfor %}
             </div>
         </div>
