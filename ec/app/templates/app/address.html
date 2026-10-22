@@ -28,13 +28,27 @@
                 <p>State: {{ ad.state }}</p>
                 <p>Pincode: {{ ad.zipcode }}</p>
 
-                <p class="text-center"><a href="{% url 'updateAddress' pk=ad.id %}" type="button" class="btn btn-success">Update</a></p>
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{% url 'updateAddress' pk=ad.id %}" class="btn btn-success">Update</a>
+                  <form method="post" action="{% url 'delete-address' ad.id %}" onsubmit="return confirm('Delete this delivery address?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                  </form>
+                </div>
 
               </div>
             </div>
           </div>
+        {% empty %}
+          <div class="col-12">
+            <p>You haven't saved a delivery address yet.</p>
+            <a class="btn btn-primary" href="{% url 'profile' %}">Add an address</a>
+          </div>
         {% endfor %}
       </div>
+      {% if add %}
+        <a class="btn btn-primary mt-3" href="{% url 'profile' %}">Add another address</a>
+      {% endif %}
     </div>
   </div>
 </div>

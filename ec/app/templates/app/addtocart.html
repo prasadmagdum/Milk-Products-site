@@ -56,7 +56,7 @@
                     <button class="remove-cart btn btn-danger btn-sm" pid="{{ item.product.id }}">
                       Remove item
                     </button>
-                    <h6>Rs. {{ item.product.discounted_price|floatformat:2 }}</h6>
+                    <h6>Rs. {{ item.total_cost|floatformat:2 }}</h6>
                   </div>
                 </div>
 

@@ -1,4 +1,5 @@
 from decimal import Decimal
+from urllib.parse import urlsplit
 
 from django.core import mail
 from django.contrib.auth.models import User
@@ -156,6 +157,31 @@ class ShopFlowTests(TestCase):
         self.other_address.refresh_from_db()
         self.assertEqual(self.other_address.name, 'Other')
 
+    def test_customer_can_update_own_address(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse('updateAddress', args=[self.address.pk]),
+            {'name': 'Buyer Updated', 'locality': 'New Road', 'city': 'Kolhapur',
+             'mobile': '00123456789', 'zipcode': '0416001', 'state': 'MH'},
+        )
+        self.assertRedirects(response, reverse('address'))
+        self.address.refresh_from_db()
+        self.assertEqual(self.address.name, 'Buyer Updated')
+        self.assertEqual(self.address.mobile, '00123456789')
+
+    def test_address_delete_is_post_only_and_private(self):
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(reverse('delete-address', args=[self.address.pk])).status_code, 405)
+
+        response = self.client.post(reverse('delete-address', args=[self.other_address.pk]))
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Customer.objects.filter(pk=self.other_address.pk).exists())
+
+        response = self.client.post(reverse('delete-address', args=[self.address.pk]))
+        self.assertRedirects(response, reverse('address'))
+        self.assertFalse(Customer.objects.filter(pk=self.address.pk).exists())
+        self.assertContains(self.client.get(reverse('address')), "You haven't saved a delivery address yet.")
+
     def test_contact_form_saves_valid_message(self):
         response = self.client.post(reverse('contact'), {
             'name': 'Visitor',
@@ -200,3 +226,42 @@ class ShopFlowTests(TestCase):
         self.assertRedirects(response, reverse('password_reset_done'))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('/password-reset-confirm/', mail.outbox[0].body)
+
+        reset_url = next(
+            line for line in mail.outbox[0].body.splitlines()
+            if '/password-reset-confirm/' in line
+        )
+        reset_path = urlsplit(reset_url).path
+        response = self.client.get(reset_path, follow=True)
+        self.assertContains(response, 'Set new password')
+        reset_path = response.request['PATH_INFO']
+
+        new_password = 'Different!Pass-2026'
+        response = self.client.post(reset_path, {
+            'new_password1': new_password,
+            'new_password2': new_password,
+        })
+        self.assertRedirects(response, reverse('password_reset_complete'))
+        self.assertTrue(self.client.login(username='buyer', password=new_password))
+
+    def test_invalid_password_reset_token_has_recovery_action(self):
+        response = self.client.get(
+            reverse('password_reset_confirm', args=['invalid-uid', 'invalid-token'])
+        )
+        self.assertContains(response, 'Request a new reset link')
+        self.assertNotContains(response, 'Set new password')
+
+    def test_authenticated_customer_can_change_password(self):
+        self.client.force_login(self.user)
+        response = self.client.post(reverse('passwordchange'), {
+            'old_password': 'test-password-123',
+            'new_password1': 'New!Secure-Pass-2026',
+            'new_password2': 'New!Secure-Pass-2026',
+        })
+        self.assertRedirects(response, reverse('passwordchangedone'))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('New!Secure-Pass-2026'))
+
+    def test_login_page_contains_valid_registration_link_markup(self):
+        response = self.client.get(reverse('login'))
+        self.assertContains(response, 'class="text-danger">Create an Account</a>')

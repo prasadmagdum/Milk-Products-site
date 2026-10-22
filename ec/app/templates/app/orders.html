@@ -14,7 +14,7 @@
                     <p class="mb-0">Status: {{ order.get_status_display }} · Cash on delivery</p>
                 </div>
                 <div class="text-end">
-                    <p class="fw-bold">Rs. {{ order.total_amount }}</p>
+                    <p class="fw-bold">Rs. {{ order.total_amount|floatformat:2 }}</p>
                     <a href="{% url 'order-detail' order.id %}" class="btn btn-outline-primary">View order</a>
                 </div>
             </div>
