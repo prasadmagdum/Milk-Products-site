@@ -1,7 +1,7 @@
 {% extends "app/base.html" %}
 {% load static %} 
 
-{% block title %}Contact{% endblock title %}
+{% block title %}About{% endblock title %}
 
 {% comment %} {% block banner-slider %}
     <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
@@ -28,28 +28,28 @@
         <!-- Contact Information -->
         <div class="col-lg-6 mb-4">
             <h2 class="fw-bold">Contact Details</h2>
-            <p>Have a question about a product or order? Send us a message and our team will follow up.</p>
+            <p><strong>Address:</strong> 123 Main Street, City Center, Metropolis 56789</p>
+            <p><strong>Email:</strong> <a href="mailto:info@example.com">info@example.com</a></p>
+            <p><strong>Phone:</strong> <a href="tel:+1234567890">+1 234 567 890</a></p>
+            <p><strong>Working Hours:</strong> Monday to Friday, 9:00 AM - 5:00 PM</p>
         </div>
 
         <!-- Contact Form -->
         <div class="col-lg-6">
             <h2 class="fw-bold">Get in Touch</h2>
-            <form action="{% url 'contact' %}" method="post">
+            <form action="/contact" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
-                    {{ form.name.label_tag }}
-                    {{ form.name }}
-                    <small class="text-danger">{{ form.name.errors|striptags }}</small>
+                    <label for="name" class="form-label">Your Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
                 </div>
                 <div class="mb-3">
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                    <small class="text-danger">{{ form.email.errors|striptags }}</small>
+                    <label for="email" class="form-label">Your Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 <div class="mb-3">
-                    {{ form.message.label_tag }}
-                    {{ form.message }}
-                    <small class="text-danger">{{ form.message.errors|striptags }}</small>
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" placeholder="Write your message" required></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">Send Message</button>
             </form>

@@ -4,58 +4,59 @@
 {% block title %}Checkout{% endblock title%}
 {% block main-content %}
 <div class="container">
-    <div class="row mt-5">
-        <div class="col-sm-6">
-            <h4>Order Summary</h4>
-            <hr>
-            {% for item in cart_items %}
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h5>{{ item.product.title }}</h5>
-                        <p>Quantity: {{ item.quantity }}</p>
-                        <p class="fw-bold">Price: Rs. {{ item.total_cost|floatformat:2 }}</p>
-                    </div>
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+<div class="row mt-5">
+    <div class="col-sm-6">
+        <h4>Order Summary</h4>
+        <hr>
+        {% for item in cart_items %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5>Product: {{ item.product.title }}</h5>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p class="fw-bold">Price: Rs. {{ item.product.discounted_price }}</p>
                 </div>
+            </div>
+        {% endfor %}
+            <p class="fw-bold">Total Cost + 40 = {{totalamount}}</p>
+            <small>Term and Conditions Apply</small>
+    </div>
+    <div class="col-sm-4 offset-sm-1">
+        <h4>Shipping Address</h4>
+        <hr>
+        <form method="POST" id="myform  ">  
+
+            {% csrf_token %}
+            {% for ad   in  add %}
+            <div class="card">
+            <div class="card-body">
+                <h5>{{ad.name}}</h5>
+                <p>Mobile: {{ad.mobile}}</p>
+                <p>{{ad.locality}}, {{ad.city}}, {{ad.state}} - {{ad.zipcode}}</p>
+                </div>
+            </div>
+            <div class="form-check mt-2 mb-2">
+                <input class="form-check-input" type="radio" name="custid" id="custadd{{forloop.counter}}" value="{{ad.id}}" >
+                <label class="form-check-label" for="custadd{{forloop.counter}}">
+                    Select Address: {{forloop.counter}}</label>
+            </div>
             {% endfor %}
-            <p>Items: Rs. {{ amount|floatformat:2 }}</p>
-            <p>Shipping: Rs. {{ shipping|floatformat:2 }}</p>
-            <p class="fw-bold">Total: Rs. {{ totalamount|floatformat:2 }}</p>
-            <p>Payment method: Cash on delivery</p>
-        </div>
-        <div class="col-sm-4 offset-sm-1">
-            <h4>Shipping Address</h4>
-            <hr>
-            {% if add %}
-            <form method="post">
-                {% csrf_token %}
 
-                {% for ad in add %}
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <h5>{{ ad.name }}</h5>
-                            <p>Mobile: {{ ad.mobile }}</p>
-                            <p>{{ ad.locality }}, {{ ad.city }}, {{ ad.state }} - {{ ad.zipcode }}</p>
-                        </div>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="radio" name="custid" id="custadd{{ forloop.counter }}" value="{{ ad.id }}" required>
-                        <label class="form-check-label" for="custadd{{ forloop.counter }}">
-                            Deliver to this address
-                        </label>
-                    </div>
-                {% endfor %}
-
-                <div class="mb-3">
-                    <label for="totamount" class="form-label">Total amount</label>
-                    <input type="text" class="form-control" id="totamount" value="Rs. {{ totalamount|floatformat:2 }}" readonly>
-                </div>
-                <button type="submit" class="btn btn-primary">Place COD order</button>
-            </form>
-            {% else %}
-                <p>You need a delivery address before placing an order.</p>
-                <a class="btn btn-primary" href="{% url 'profile' %}">Add an address</a>
-            {% endif %}
-        </div>
+            <div class="from-check mb-3">
+                <label for ="totamount" class="form-label">Total Amount</label>
+                <input type="number" class="form-control" id="totamount" name="totamount" value="{{totalamount}}" readonly>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Continue to Payment</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock main-content %}
