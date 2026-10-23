@@ -4,11 +4,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .forms import LoginFrom, MyPasswordChangeForm, MyPasswordResetFrom, MySetPasswordForm
 from django.contrib.auth import views as auth_views
+from django.views.decorators.http import require_POST
 
 urlpatterns = [
     path("", views.home, name="home"),
     path('about/', views.about, name="about"),
     path('contact/', views.contact, name="contact"),
+    path('search/', views.product_search, name='product-search'),
     path("category/<slug:val>/", views.categoryView.as_view(), name="category"),
     path("category-title/<val>/", views.categoryTitle.as_view(), name="category-title"),
     path("product/<int:pk>/", views.ProductDetail.as_view(), name="productdetail"),
@@ -22,6 +24,10 @@ urlpatterns = [
     path('pluscart/', views.plus_cart, name='pluscart'),
     path('minuscart/', views.minus_cart, name='minuscart'), 
     path('removecart/', views.remove_cart, name='removecart'),
+    path('orders/', views.orders, name='orders'),
+    path('wishlist/', views.wishlist, name='wishlist'),
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='wishlist-add'),
+    path('wishlist/remove/<int:product_id>/', views.remove_from_wishlist, name='wishlist-remove'),
     
 
     path('registration/', views.CustomerRegistrationView.as_view(), name='customerregistrationview'),
@@ -32,13 +38,13 @@ urlpatterns = [
         authentication_form=LoginFrom
     ), name='login'),
 
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', require_POST(auth_views.LogoutView.as_view(next_page='login')), name='logout'),
 
     # PASSWORD RESET FLOW
     path('password-reset/', auth_views.PasswordResetView.as_view(
         template_name='app/password_reset.html',
         form_class=MyPasswordResetFrom,
-        email_template_name='app/password_reset_email.html',
+        email_template_name='app/password_reset_email.txt',
         success_url='/password-reset/done/'
     ), name='password_reset'),
 

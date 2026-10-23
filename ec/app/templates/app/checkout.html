@@ -4,14 +4,6 @@
 {% block title %}Checkout{% endblock title%}
 {% block main-content %}
 <div class="container">
-    {% if messages %}
-        {% for msg in messages %}
-            <div class="alert alert-danger" role="alert">
-                {{ msg }}
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
 <div class="row mt-5">
     <div class="col-sm-6">
         <h4>Order Summary</h4>
@@ -21,17 +13,19 @@
                 <div class="card-body">
                     <h5>Product: {{ item.product.title }}</h5>
                     <p>Quantity: {{ item.quantity }}</p>
-                    <p class="fw-bold">Price: Rs. {{ item.product.discounted_price }}</p>
+                    <p class="fw-bold">Price: Rs. {{ item.total_cost }}</p>
                 </div>
             </div>
         {% endfor %}
-            <p class="fw-bold">Total Cost + 40 = {{totalamount}}</p>
-            <small>Term and Conditions Apply</small>
+            <p>Subtotal: Rs. {{ amount }}</p>
+            <p>Shipping: Rs. {{ shipping_cost }}</p>
+            <p class="fw-bold">Total: Rs. {{ totalamount }}</p>
+            <small>Payment is not collected online. Your order will be marked pending.</small>
     </div>
     <div class="col-sm-4 offset-sm-1">
         <h4>Shipping Address</h4>
         <hr>
-        <form method="POST" id="myform  ">  
+        <form method="post" id="checkout-form">
 
             {% csrf_token %}
             {% for ad   in  add %}
@@ -39,11 +33,11 @@
             <div class="card-body">
                 <h5>{{ad.name}}</h5>
                 <p>Mobile: {{ad.mobile}}</p>
-                <p>{{ad.locality}}, {{ad.city}}, {{ad.state}} - {{ad.zipcode}}</p>
+                <p>{{ad.locality}}, {{ad.city}}, {{ad.get_state_display}} - {{ad.zipcode}}</p>
                 </div>
             </div>
             <div class="form-check mt-2 mb-2">
-                <input class="form-check-input" type="radio" name="custid" id="custadd{{forloop.counter}}" value="{{ad.id}}" >
+                <input class="form-check-input" type="radio" name="custid" id="custadd{{forloop.counter}}" value="{{ad.id}}" {% if forloop.first %}checked{% endif %}>
                 <label class="form-check-label" for="custadd{{forloop.counter}}">
                     Select Address: {{forloop.counter}}</label>
             </div>
@@ -51,12 +45,13 @@
 
             <div class="from-check mb-3">
                 <label for ="totamount" class="form-label">Total Amount</label>
-                <input type="number" class="form-control" id="totamount" name="totamount" value="{{totalamount}}" readonly>
+                <input type="text" class="form-control" id="totamount" value="Rs. {{ totalamount }}" readonly>
             </div>
             <div class="text-end">
-                <button type="submit" class="btn btn-primary">Continue to Payment</button>
+                <button type="submit" class="btn btn-primary">Place Order</button>
             </div>
         </form>
     </div>
+</div>
 </div>
 {% endblock main-content %}

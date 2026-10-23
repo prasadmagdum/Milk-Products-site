@@ -5,6 +5,7 @@
 
 {% block main-content %}
 <div class="container my-5">
+  <form class="d-none">{% csrf_token %}</form>
   <div class="row">
     <div class="col-12">
       <h1 class="text-center mb-5">Shopping Cart</h1>
@@ -25,7 +26,7 @@
                 <div class="col-md-3 text-center">
                   <img src="{{ item.product.product_image.url }}"
                        class="img-fluid img-thumbnail"
-                       style="max-height:120px;">
+                       style="max-height:120px;" alt="{{ item.product.title }}">
                 </div>
 
                 <div class="col-md-9">
@@ -54,7 +55,7 @@
                     <button class="remove-cart btn btn-danger btn-sm" pid="{{ item.product.id }}">
                       Remove item
                     </button>
-                    <h6>Rs. {{ item.product.discounted_price }}</h6>
+                    <h6>Rs. {{ item.total_cost }}</h6>
                   </div>
                 </div>
 
@@ -81,7 +82,7 @@
               </li>
 
               <li class="list-group-item d-flex justify-content-between">
-                Shipping <strong>Rs. 40</strong>
+                Shipping <strong>Rs. {{ shipping_cost }}</strong>
               </li>
 
               <li class="list-group-item d-flex justify-content-between">

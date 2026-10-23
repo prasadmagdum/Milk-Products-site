@@ -1,14 +1,12 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}
-    Category
-{% endblock title %}
+{% block title %}{{ product.title }}{% endblock title %}
 {% block main-content %}
     <div class="container">
         <div class="row justify-content-between">
             <div class="img2 col-lg-5 mt-5">
-                <img src="{{ product.product_image.url }}" class="image w-100 h-75" alt="Product Image">
+                <img src="{{ product.product_image.url }}" class="image w-100 h-75" alt="{{ product.title }}">
             </div>
             <div class="productdetail col-lg-5">
                 <h1 style="font-family:Georgia; font-size: 50px;">
@@ -23,14 +21,37 @@
                 <ul class="fs-5" style="font-family:Rajdhani;">
                     <li>{{ product.description }}</li>
                 </ul>
-                 <form action="/add-to-cart" class="d-online">
-                      <input type="hidden" name="prod_id" value="{{ product.id }}">
+                 <form action="{% url 'add-to-cart' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="prod_id" value="{{ product.id }}">
                     <button type="submit" class="btn btn-danger btn-lg m-1">
                         Add to Cart
                     </button>
-                 <a href="{% url 'showcart' %}" class="btn btn-warning btn-lg shadow px-5 py-2 ms-2"> Buy Now</a>
-                    
-               
+                    <a href="{% url 'showcart' %}" class="btn btn-warning btn-lg shadow px-5 py-2 ms-2">View Cart</a>
+                 </form>
+                 {% if product.composition %}
+                    <h4 class="mt-4">Composition</h4>
+                    <p>{{ product.composition }}</p>
+                 {% endif %}
+                 {% if product.prodapp %}
+                    <h4>Product Applications</h4>
+                    <p>{{ product.prodapp }}</p>
+                 {% endif %}
+                 {% if request.user.is_authenticated %}
+                   {% if in_wishlist %}
+                  <form action="{% url 'wishlist-remove' product.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary">Remove from Wishlist</button>
+                  </form>
+                   {% else %}
+                  <form action="{% url 'wishlist-add' product.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary">Add to Wishlist</button>
+                  </form>
+                   {% endif %}
+                 {% else %}
+                   <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-outline-secondary">Sign in to save</a>
+                 {% endif %}
             </div>
         </div>
     </div>

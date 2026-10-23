@@ -25,7 +25,7 @@
                 <p>Locality: {{ ad.locality }}</p>
                 <p>Mobile: {{ ad.mobile }}</p>
                 <p>City: {{ ad.city }}</p>
-                <p>State: {{ ad.state }}</p>
+                <p>State: {{ ad.get_state_display }}</p>
                 <p>Pincode: {{ ad.zipcode }}</p>
 
                 <p class="text-center"><a href="{% url 'updateAddress' pk=ad.id %}" type="button" class="btn btn-success">Update</a></p>
@@ -34,6 +34,12 @@
             </div>
           </div>
         {% endfor %}
+        {% if not add %}
+          <div class="col-12">
+            <p>You haven't added a delivery address yet.</p>
+            <a href="{% url 'profile' %}" class="btn btn-primary">Add an address</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>

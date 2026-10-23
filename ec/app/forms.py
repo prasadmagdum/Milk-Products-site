@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField, PasswordChangeForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
+from django.core.validators import MinLengthValidator
 from .models import Customer
 
 class LoginFrom(AuthenticationForm):
@@ -37,7 +38,24 @@ class CustomerProfileForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'locality': forms.TextInput(attrs={'class': 'form-control'}),
             'city': forms.TextInput(attrs={'class': 'form-control'}),
-            'mobile': forms.NumberInput(attrs={'class': 'form-control'}),
-            'zipcode': forms.NumberInput(attrs={'class': 'form-control'}),
+            'mobile': forms.TextInput(attrs={'class': 'form-control', 'type': 'tel', 'autocomplete': 'tel', 'maxlength': 16}),
+            'zipcode': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'autocomplete': 'postal-code', 'maxlength': 10}),
             'state': forms.Select(attrs={'class': 'form-control'}),
         }
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    message = forms.CharField(
+        validators=[MinLengthValidator(10)],
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+    )
+
+
+class CheckoutAddressForm(forms.Form):
+    custid = forms.ModelChoiceField(queryset=Customer.objects.none())
+
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['custid'].queryset = Customer.objects.filter(user=user)

@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
+import secrets
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +22,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w7$(u32!(6&vz$t7-o@+(+)_u$^2j0gtm!sjd^u#$#vx8ehvfd'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() in {'1', 'true', 'yes'}
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be set when DEBUG is disabled.')
+    SECRET_KEY = secrets.token_urlsafe(64)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+configured_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS')
+if not DEBUG and not configured_hosts:
+    raise ImproperlyConfigured('DJANGO_ALLOWED_HOSTS must be set when DEBUG is disabled.')
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in (configured_hosts or 'localhost,127.0.0.1,[::1]').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -63,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processors.cart_count',
             ],
         },
     },
@@ -119,6 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
 LOGIN_REDIRECT_URL = '/profile/'
@@ -128,3 +141,40 @@ LOGIN_REDIRECT_URL = '/profile/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'
+    if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '').lower() in {'1', 'true', 'yes'}
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DEFAULT_FROM_EMAIL',
+    'webmaster@localhost' if DEBUG else '',
+)
+CONTACT_RECIPIENT_EMAIL = os.environ.get(
+    'CONTACT_RECIPIENT_EMAIL',
+    DEFAULT_FROM_EMAIL if DEBUG else '',
+)
+if not DEBUG and not DEFAULT_FROM_EMAIL:
+    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL must be set when DEBUG is disabled.')
+if not DEBUG and not CONTACT_RECIPIENT_EMAIL:
+    raise ImproperlyConfigured('CONTACT_RECIPIENT_EMAIL must be set when DEBUG is disabled.')
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = int(os.environ.get(
+    'SECURE_HSTS_SECONDS',
+    '0' if DEBUG else '31536000',
+))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get(
+    'SECURE_HSTS_INCLUDE_SUBDOMAINS',
+    'false',
+).lower() in {'1', 'true', 'yes'}
+SECURE_HSTS_PRELOAD = os.environ.get(
+    'SECURE_HSTS_PRELOAD',
+    'false',
+).lower() in {'1', 'true', 'yes'}

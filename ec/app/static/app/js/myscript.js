@@ -1,5 +1,20 @@
 $(document).ready(function(){
 
+function updateCart(url, id, success) {
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+            prod_id: id,
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').first().val()
+        },
+        success: success,
+        error: function() {
+            window.alert("Unable to update your cart. Please refresh the page and try again.");
+        }
+    });
+}
+
 // ---------------- OWL ----------------
 $('#slider1, #slider2, #slider3').owlCarousel({
     loop: true,
@@ -18,15 +33,10 @@ $(document).on('click', '.plus-cart', function(){
     var id = $(this).attr("pid").toString();
     var quantitySpan = $("#quantity-" + id);
 
-    $.ajax({
-        type: "GET",
-        url: "/pluscart/",
-        data: { prod_id: id },
-        success: function(data){
-            quantitySpan.text(data.quantity);
-            $("#amount").text("Rs. " + data.amount);
-            $("#totalamount").text("Rs. " + data.totalamount);
-        }
+    updateCart("/pluscart/", id, function(data){
+        quantitySpan.text(data.quantity);
+        $("#amount").text("Rs. " + data.amount);
+        $("#totalamount").text("Rs. " + data.totalamount);
     });
 });
 
@@ -36,15 +46,10 @@ $(document).on('click', '.minus-cart', function(){
     var id = $(this).attr("pid").toString();
     var quantitySpan = $("#quantity-" + id);
 
-    $.ajax({
-        type: "GET",
-        url: "/minuscart/",
-        data: { prod_id: id },
-        success: function(data){
-            quantitySpan.text(data.quantity);
-            $("#amount").text("Rs. " + data.amount);
-            $("#totalamount").text("Rs. " + data.totalamount);
-        }
+    updateCart("/minuscart/", id, function(data){
+        quantitySpan.text(data.quantity);
+        $("#amount").text("Rs. " + data.amount);
+        $("#totalamount").text("Rs. " + data.totalamount);
     });
 });
 
@@ -56,24 +61,15 @@ $(document).on('click', '.remove-cart', function(e){
     var id = $(this).attr("pid").toString();
     var row = $(this).closest('.cart-item');
 
-    $.ajax({
-        type: "GET",
-        url: "/removecart/",
-        data: { prod_id: id },
-        success: function(data){
-
-            $("#amount").text("Rs. " + data.amount);
-            $("#totalamount").text("Rs. " + data.totalamount);
-
-            row.fadeOut(300, function(){
-                $(this).remove();
-
-                // if empty reload
-                if ($('.cart-item').length === 0){
-                    location.reload();
-                }
-            });
-        }
+    updateCart("/removecart/", id, function(data){
+        $("#amount").text("Rs. " + data.amount);
+        $("#totalamount").text("Rs. " + data.totalamount);
+        row.fadeOut(300, function(){
+            $(this).remove();
+            if ($('.cart-item').length === 0){
+                location.reload();
+            }
+        });
     });
 });
 
