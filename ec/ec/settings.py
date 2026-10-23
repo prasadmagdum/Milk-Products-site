@@ -11,13 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
-<<<<<<< HEAD
 import secrets
-=======
->>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
 from pathlib import Path
-from django.core.exceptions import ImproperlyConfigured
-
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,8 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-<<<<<<< HEAD
-DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() in {'1', 'true', 'yes'}
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').strip().lower() in {
+    '1', 'true', 'yes', 'on',
+}
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
@@ -43,27 +39,6 @@ ALLOWED_HOSTS = [
     for host in (configured_hosts or 'localhost,127.0.0.1,[::1]').split(',')
     if host.strip()
 ]
-=======
-DEBUG = os.environ.get('DJANGO_DEBUG', 'true').strip().lower() in {'1', 'true', 'yes', 'on'}
-
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-if not SECRET_KEY:
-    if not DEBUG:
-        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY when DJANGO_DEBUG is disabled.')
-    SECRET_KEY = 'django-insecure-local-development-only-key'
-
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
-    if host.strip()
-]
-if not ALLOWED_HOSTS and DEBUG:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
-elif not ALLOWED_HOSTS:
-    raise ImproperlyConfigured(
-        'Set DJANGO_ALLOWED_HOSTS to a comma-separated list of production hostnames.'
-    )
->>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
 
 
 # Application definition
@@ -218,44 +193,11 @@ if (
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-<<<<<<< HEAD
-
-EMAIL_BACKEND = os.environ.get(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.console.EmailBackend'
-    if DEBUG else 'django.core.mail.backends.smtp.EmailBackend',
-)
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '').lower() in {'1', 'true', 'yes'}
-DEFAULT_FROM_EMAIL = os.environ.get(
-    'DEFAULT_FROM_EMAIL',
-    'webmaster@localhost' if DEBUG else '',
-)
 CONTACT_RECIPIENT_EMAIL = os.environ.get(
-    'CONTACT_RECIPIENT_EMAIL',
+    'DJANGO_CONTACT_RECIPIENT_EMAIL',
     DEFAULT_FROM_EMAIL if DEBUG else '',
 )
-if not DEBUG and not DEFAULT_FROM_EMAIL:
-    raise ImproperlyConfigured('DEFAULT_FROM_EMAIL must be set when DEBUG is disabled.')
 if not DEBUG and not CONTACT_RECIPIENT_EMAIL:
-    raise ImproperlyConfigured('CONTACT_RECIPIENT_EMAIL must be set when DEBUG is disabled.')
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_HSTS_SECONDS = int(os.environ.get(
-    'SECURE_HSTS_SECONDS',
-    '0' if DEBUG else '31536000',
-))
-SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get(
-    'SECURE_HSTS_INCLUDE_SUBDOMAINS',
-    'false',
-).lower() in {'1', 'true', 'yes'}
-SECURE_HSTS_PRELOAD = os.environ.get(
-    'SECURE_HSTS_PRELOAD',
-    'false',
-).lower() in {'1', 'true', 'yes'}
-=======
->>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
+    raise ImproperlyConfigured(
+        'DJANGO_CONTACT_RECIPIENT_EMAIL must be set when DEBUG is disabled.'
+    )
