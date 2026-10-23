@@ -45,12 +45,6 @@
             <a class="btn btn-primary" href="{% url 'profile' %}">Add an address</a>
           </div>
         {% endfor %}
-        {% if not add %}
-          <div class="col-12">
-            <p>You haven't added a delivery address yet.</p>
-            <a href="{% url 'profile' %}" class="btn btn-primary">Add an address</a>
-          </div>
-        {% endif %}
       </div>
       {% if add %}
         <a class="btn btn-primary mt-3" href="{% url 'profile' %}">Add another address</a>

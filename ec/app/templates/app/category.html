@@ -15,7 +15,7 @@
         <div class="col-sm-3">
             <div class="list-group">
                 {% for val in title %}
-                    <a href="{% url 'category-title' val.title %}" class="list-group-item list-group-item-action">
+                    <a href="{% url 'category-title' val.title %}?category={{ category_code }}" class="list-group-item list-group-item-action">
                     {{ val.title }}</a>
                 {% endfor %}
                 {% if not product %}

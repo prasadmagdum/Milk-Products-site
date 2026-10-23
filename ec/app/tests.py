@@ -46,6 +46,31 @@ class StoreFlowTests(TestCase):
         self.assertEqual(self.client.get(reverse('category', args=['XX'])).status_code, 404)
         self.assertEqual(self.client.get(reverse('productdetail', args=[999])).status_code, 404)
 
+    def test_category_title_filters_duplicate_titles_by_category(self):
+        other_category_product = Product.objects.create(
+            title=self.product.title,
+            selling_price=Decimal('70.00'),
+            discounted_price=Decimal('65.00'),
+            description='Milkshake made with dairy milk',
+            category='MS',
+            product_image='product/fresh-milkshake.png',
+        )
+        category_url = reverse('category', args=['ML'])
+        category_response = self.client.get(category_url)
+        self.assertContains(category_response, f'?category=ML')
+
+        title_url = reverse('category-title', args=[self.product.title])
+        response = self.client.get(title_url, {'category': 'ML'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context['product']), [self.product])
+
+        response = self.client.get(title_url, {'category': 'MS'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context['product']), [other_category_product])
+
+        self.assertEqual(self.client.get(title_url).status_code, 200)
+        self.assertEqual(self.client.get(title_url, {'category': 'invalid'}).status_code, 404)
+
     def test_cart_mutations_require_authentication_and_post(self):
         add_url = reverse('add-to-cart')
         self.assertEqual(self.client.post(add_url, {'prod_id': self.product.pk}).status_code, 302)
@@ -105,6 +130,21 @@ class StoreFlowTests(TestCase):
         self.assertEqual(self.client.get(reverse('updateAddress', args=[self.address.pk])).status_code, 404)
         self.assertEqual(self.client.get(reverse('address')).status_code, 200)
         self.assertNotContains(self.client.get(reverse('address')), 'Main Road')
+
+    def test_address_can_only_be_deleted_by_its_owner_using_post(self):
+        delete_url = reverse('delete-address', args=[self.address.pk])
+        self.client.force_login(self.user)
+        self.assertContains(self.client.get(reverse('address')), delete_url)
+        self.assertEqual(self.client.get(delete_url).status_code, 405)
+        self.client.force_login(self.other_user)
+        response = self.client.post(delete_url)
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Customer.objects.filter(pk=self.address.pk).exists())
+
+        self.client.force_login(self.user)
+        response = self.client.post(delete_url)
+        self.assertRedirects(response, reverse('address'))
+        self.assertFalse(Customer.objects.filter(pk=self.address.pk).exists())
 
     def test_profile_and_address_update_save_customer_addresses(self):
         self.client.force_login(self.user)

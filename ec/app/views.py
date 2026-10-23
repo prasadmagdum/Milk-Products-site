@@ -71,18 +71,31 @@ class categoryView(View):
             'product': product,
             'title': title,
             'page_title': categories[val],
+            'category_code': val,
         })
     
 
 class categoryTitle(View):
     def get(self,request,val):
-        selected_product = get_object_or_404(Product, title=val)
-        product = Product.objects.filter(category=selected_product.category, title=val)
-        title = Product.objects.filter(category=selected_product.category).values('title').distinct().order_by('title')
+        products = Product.objects.filter(title=val)
+        category_code = request.GET.get('category')
+        categories = dict(Product._meta.get_field('category').choices)
+        if category_code:
+            if category_code not in categories:
+                raise Http404("Product category not found")
+            products = products.filter(category=category_code)
+
+        selected_product = products.order_by('pk').first()
+        if selected_product is None:
+            raise Http404("Product title not found")
+        category_code = selected_product.category
+        product = products.filter(category=category_code)
+        title = Product.objects.filter(category=category_code).values('title').distinct().order_by('title')
         return render(request, "app/category.html", {
             'product': product,
             'title': title,
-            'page_title': selected_product.get_category_display(),
+            'page_title': categories[category_code],
+            'category_code': category_code,
         })
     
 class ProductDetail(View):
