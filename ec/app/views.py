@@ -129,6 +129,15 @@ def address(request):
     add = Customer.objects.filter(user=request.user)
     return render(request, 'app/address.html', locals())
 
+@login_required
+@require_POST
+def delete_address(request, pk):
+    customer = get_object_or_404(Customer, pk=pk, user=request.user)
+    customer.delete()
+    messages.success(request, "The delivery address was deleted.")
+    return redirect('address')
+
+
 @method_decorator(login_required, name='dispatch')
 class updateAddress(View):
     def get(self, request,pk):

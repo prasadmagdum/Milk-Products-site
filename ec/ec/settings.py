@@ -11,8 +11,13 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+<<<<<<< HEAD
 import secrets
+=======
+>>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
+<<<<<<< HEAD
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true').lower() in {'1', 'true', 'yes'}
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
@@ -37,6 +43,27 @@ ALLOWED_HOSTS = [
     for host in (configured_hosts or 'localhost,127.0.0.1,[::1]').split(',')
     if host.strip()
 ]
+=======
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true').strip().lower() in {'1', 'true', 'yes', 'on'}
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY when DJANGO_DEBUG is disabled.')
+    SECRET_KEY = 'django-insecure-local-development-only-key'
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+if not ALLOWED_HOSTS and DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+elif not ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        'Set DJANGO_ALLOWED_HOSTS to a comma-separated list of production hostnames.'
+    )
+>>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
 
 
 # Application definition
@@ -133,13 +160,65 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR/'media'
+MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = '/profile/'
+LOGOUT_REDIRECT_URL = 'login'
+
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = int(
+    os.environ.get('DJANGO_HSTS_SECONDS', '0' if DEBUG else '3600')
+)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get(
+    'DJANGO_HSTS_INCLUDE_SUBDOMAINS', 'false'
+).strip().lower() in {'1', 'true', 'yes', 'on'}
+SECURE_HSTS_PRELOAD = os.environ.get(
+    'DJANGO_HSTS_PRELOAD', 'false'
+).strip().lower() in {'1', 'true', 'yes', 'on'}
+if SECURE_HSTS_PRELOAD and (
+    not SECURE_HSTS_INCLUDE_SUBDOMAINS or SECURE_HSTS_SECONDS < 31536000
+):
+    raise ImproperlyConfigured(
+        'HSTS preload requires subdomains and a max-age of at least one year.'
+    )
+
+EMAIL_BACKEND = os.environ.get(
+    'DJANGO_EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend' if DEBUG
+    else 'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT', '25'))
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS', 'false').strip().lower() in {
+    '1', 'true', 'yes', 'on',
+}
+EMAIL_USE_SSL = os.environ.get('DJANGO_EMAIL_USE_SSL', 'false').strip().lower() in {
+    '1', 'true', 'yes', 'on',
+}
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ImproperlyConfigured('Use either DJANGO_EMAIL_USE_TLS or DJANGO_EMAIL_USE_SSL, not both.')
+
+DEFAULT_FROM_EMAIL = os.environ.get(
+    'DJANGO_DEFAULT_FROM_EMAIL',
+    'webmaster@localhost' if DEBUG else '',
+)
+if (
+    not DEBUG
+    and EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend'
+    and (not os.environ.get('DJANGO_EMAIL_HOST') or not DEFAULT_FROM_EMAIL)
+):
+    raise ImproperlyConfigured(
+        'Set DJANGO_EMAIL_HOST and DJANGO_DEFAULT_FROM_EMAIL for production SMTP.'
+    )
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+<<<<<<< HEAD
 
 EMAIL_BACKEND = os.environ.get(
     'EMAIL_BACKEND',
@@ -178,3 +257,5 @@ SECURE_HSTS_PRELOAD = os.environ.get(
     'SECURE_HSTS_PRELOAD',
     'false',
 ).lower() in {'1', 'true', 'yes'}
+=======
+>>>>>>> fc140a8ad4b7dff731485519e08b0e5ec4a1caba
