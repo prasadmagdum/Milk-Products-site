@@ -25,4 +25,9 @@ python manage.py runserver
 
 Result :
 
-![image](https://github.com/prasadmagdum/Milk-Products-site/blob/531a5a29e4c8747df544f05a005356c85cc8b559/Screenshot%202026-05-04%20212437.png)
+![image](https://github.com/prasadmagdum/Milk-Products-site/blob/2a7fd3a5cbd4b5498abf31ab35d5f80b79ef3c7a/Screenshot%202026-10-25%20113157.png)
+
+![image](https://github.com/prasadmagdum/Milk-Products-site/blob/2a7fd3a5cbd4b5498abf31ab35d5f80b79ef3c7a/Screenshot%202026-10-25%20112909.png)
+
+![image](https://github.com/prasadmagdum/Milk-Products-site/blob/2a7fd3a5cbd4b5498abf31ab35d5f80b79ef3c7a/Screenshot%202026-10-25%20113009.png)
+
