@@ -18,14 +18,10 @@ Orders are recorded with a **Pending** status. This project does not currently i
 
 From the `ec` project directory:
 
-##Backend
 ```powershell
 python manage.py runserver
 ```
-##Frontend
-```powershell
-npm run dev
-```
+
 Result :
 
 ![image](https://github.com/prasadmagdum/Milk-Products-site/blob/2a7fd3a5cbd4b5498abf31ab35d5f80b79ef3c7a/Screenshot%202026-10-25%20113157.png)
