@@ -3,7 +3,6 @@
 A Django store for browsing dairy products, managing customer addresses, and placing orders.
 
 ## Features
-
 - Product categories, search, and product details
 - Customer registration, sign-in, password change, and password reset
 - Customer address management
@@ -17,7 +16,6 @@ Orders are recorded with a **Pending** status. This project does not currently i
 ## Run locally
 
 From the `ec` project directory:
-
 ```powershell
 python manage.py runserver
 ```
